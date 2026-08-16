@@ -1,0 +1,76 @@
+package org.rakam.analysis;
+
+import org.rakam.bootstrap.SystemRegistry.ModuleDescriptor;
+import org.rakam.collection.FieldType;
+import org.rakam.server.http.HttpService;
+import org.rakam.server.http.annotations.*;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.List;
+import java.util.Map;
+
+@Path("/admin")
+@Api(
+        value = "/admin",
+        nickname = "admin",
+        description = "System operations",
+        tags = "admin"
+)
+public class AdminHttpService extends HttpService {
+
+    private final AdminService adminService;
+
+    @Inject
+    public AdminHttpService(AdminService adminService) {
+        this.adminService = adminService;
+    }
+
+    @ApiOperation(
+            value = "List installed modules",
+            authorizations = @Authorization(value = "master_key")
+    )
+    @GET
+    @Path("/configurations")
+    @JsonRequest
+    public List<ModuleDescriptor> getConfigurations() {
+        return adminService.getConfigurations();
+    }
+
+    @ApiOperation(
+            value = "List event mappers",
+            authorizations = @Authorization(value = "master_key")
+    )
+    @GET
+    @Path("/event_mappers")
+    @JsonRequest
+    public List<EventMapperDescription> getEventMappers() {
+        return adminService.getEventMappers();
+    }
+
+    @ApiOperation(
+            value = "Get types",
+            authorizations = @Authorization(value = "master_key")
+    )
+    @GET
+    @Path("/types")
+    @JsonRequest
+    public Map<String, String> getTypes() {
+        return adminService.getTypes();
+    }
+
+    @ApiOperation(
+            value = "Check lock key",
+            authorizations = @Authorization(value = "master_key")
+    )
+    @GET
+    @Path("/lock_key")
+    @JsonRequest
+    public boolean checkLockKey(
+            @ApiParam(value = "lock_key", required = false)
+            String lockKey) {
+
+        return adminService.checkLockKey(lockKey);
+    }
+}
