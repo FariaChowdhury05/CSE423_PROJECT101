@@ -1,0 +1,49 @@
+package org.rakam.analysis;
+
+import org.rakam.bootstrap.SystemRegistry;
+import org.rakam.bootstrap.SystemRegistry.ModuleDescriptor;
+import org.rakam.collection.FieldType;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class AdminService {
+
+    private final SystemRegistry systemRegistry;
+    private final EventMapperService eventMapperService;
+    private final LockKeyService lockKeyService;
+
+    @Inject
+    public AdminService(
+            SystemRegistry systemRegistry,
+            EventMapperService eventMapperService,
+            LockKeyService lockKeyService) {
+
+        this.systemRegistry = systemRegistry;
+        this.eventMapperService = eventMapperService;
+        this.lockKeyService = lockKeyService;
+    }
+
+    public List<ModuleDescriptor> getConfigurations() {
+        return systemRegistry.getModules();
+    }
+
+    public List<EventMapperDescription> getEventMappers() {
+        return eventMapperService.getEventMappers();
+    }
+
+    public Map<String, String> getTypes() {
+        return Arrays.stream(FieldType.values())
+                .collect(Collectors.toMap(
+                        FieldType::name,
+                        FieldType::getPrettyName
+                ));
+    }
+
+    public boolean checkLockKey(String lockKey) {
+        return lockKeyService.isValid(lockKey);
+    }
+}
